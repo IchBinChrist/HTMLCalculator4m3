@@ -1,87 +1,278 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taschenrechner</title>
+    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <style>
         html, body {
             height: 100%;
+            width: 100%;
             margin: 0;
         }
         #calculator {
             height: 100%;
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
         }
         .calculator {
             width: 100%;
-            max-width: 400px;
+            height: 100%;
         }
-    </style>
+        .btn-block {
+            height: 100%;
+            width: 100%;
+            font-size: calc(4vh);
+        }
+        .row > .col-3, .row > .col-12 {
+            height: calc(100% / 10);
+            
+        }
+        #display, #result {
+            height: calc(100% / 10);
+            width: 100%;
+            font-size: calc(4vh);
+            text-align: right;    
+        
+        }
+        #display.error {
+            border: 2px solid red;
+        }
+        
+        </style>
 </head>
 <body>
     <div id="calculator" class="container">
         <div class="calculator">
-            <div class="card">
+            <div class="card w-100">
                 <div class="card-body">
-                    <input type="text" id="display" class="form-control mb-3 text-right" readonly>
-                    <div class="row">
-                        <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="7">7</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="8">8</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="9">9</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-warning btn-block" data-value="/">&divide;</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="4">4</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="5">5</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="6">6</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-warning btn-block" data-value="*">&times;</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="1">1</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="2">2</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="3">3</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-warning btn-block" data-value="-">&minus;</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="0">0</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value=".">.</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-danger btn-block" id="clear">C</button></div>
-                        <div class="col-3 mb-2"><button class="btn btn-warning btn-block" data-value="+">+</button></div>
-                        <div class="col-12"><button class="btn btn-success btn-block" id="equals">=</button></div>
+                    <input type="text" id="display" class="form-control mb-3 text-right w-100" readonly>
+                    <input type="text" id="result" class="form-control mb-3 text-right w-100" readonly>
+
+                    <div class="row h-100">
+                    <!-- Erste Reihe -->
+                    <div class="col-3 mb-2"><button class="btn btn-danger btn-block" id="clear">C</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-secondary btn-block" data-value="(">(</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-secondary btn-block" data-value=")">)</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-warning btn-block" id="backspace">&larr;</button></div>
+                    <!-- Zweite Reihe -->
+                    <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="7">7</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="8">8</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="9">9</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-warning btn-block" data-value="/">&divide;</button></div>
+                    <!-- Dritte Reihe -->
+                    <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="4">4</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="5">5</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="6">6</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-warning btn-block" data-value="*">&times;</button></div>
+                    <!-- Vierte Reihe -->
+                    <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="1">1</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="2">2</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="3">3</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-warning btn-block" data-value="-">&minus;</button></div>
+                    <!-- Fünfte Reihe -->
+                    <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value="0">0</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-light btn-block" data-value=".">.</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-info btn-block" data-value="%">%</button></div>
+                    <div class="col-3 mb-2"><button class="btn btn-warning btn-block" data-value="+">+</button></div>
+                    <!-- Sechste Reihe -->
+                    <div class="col-12 mb-2"><button class="btn btn-success btn-block" id="equals">=</button></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        $(document).ready(function() {
-            let display = $('#display');
-            let currentInput = '';
-
-            $('button').on('click', function() {
-                const value = $(this).data('value');
-
-                if (value !== undefined) {
-                    currentInput += value;
-                    display.val(currentInput);
+    
+    $(document).ready(function() {
+        let display = $("#display");
+        let resultDisplay = $("#result");
+        let currentInput = "";
+    
+        const operators = ["+", "-", "*", "/"];
+    
+        function processPercentages(expression) {
+            return expression.replace(/(\d+(\.\d+)?)%/g, function(match, p1) {
+                return "(" + p1 + "/100)";
+            });
+        }
+    
+        function insertImplicitMultiplication(expression) {
+            expression = expression.replace(/(\d)(\()/g, "$1*$2");
+            expression = expression.replace(/(\))(\d)/g, "$1*$2");
+            expression = expression.replace(/(\))(\()/g, "$1*$2");
+            return expression;
+        }
+    
+        function canAddClosingBracket() {
+            let openBrackets = 0;
+            for (let char of currentInput) {
+                if (char === "(") {
+                    openBrackets++;
+                } else if (char === ")") {
+                    openBrackets--;
                 }
-            });
-
-            $('#clear').on('click', function() {
-                currentInput = '';
-                display.val('');
-            });
-
-            $('#equals').on('click', function() {
+            }
+            return openBrackets > 0;
+        }
+    
+        function isLastCharOperator() {
+            if (currentInput.length === 0) return false;
+            const lastChar = currentInput[currentInput.length - 1];
+            return operators.includes(lastChar);
+        }
+    
+        function showErrorFeedback() {
+            display.addClass("error");
+            setTimeout(function() {
+                display.removeClass("error");
+            }, 200);
+        }
+    
+        function updateResult() {
+            let tempInput = currentInput;
+            let evaluated = false;
+            while (tempInput.length > 0 && !evaluated) {
                 try {
-                    currentInput = eval(currentInput);
-                    display.val(currentInput);
+                    let processedInput = processPercentages(tempInput);
+                    processedInput = insertImplicitMultiplication(processedInput);
+                    let evaluatedResult = eval(processedInput);
+                    if (tempInput === evaluatedResult.toString()) {
+                        resultDisplay.val("");
+                    } else {
+                        resultDisplay.val(evaluatedResult);
+                    }
+                    evaluated = true;
                 } catch (e) {
-                    display.val('Error');
-                    currentInput = '';
+                    tempInput = tempInput.slice(0, -1);
                 }
-            });
+            }
+            if (!evaluated) {
+                resultDisplay.val("");
+            }
+        }
+    
+        $("button").on("click", function() {
+            const value = $(this).data("value");
+    
+            if (value !== undefined) {
+                if (operators.includes(value)) {
+                    if (isLastCharOperator()) {
+                        showErrorFeedback();
+                        return;
+                    } else {
+                        currentInput += value;
+                    }
+                } else if (value === ")") {
+                    if (canAddClosingBracket()) {
+                        currentInput += value;
+                    } else {
+                        showErrorFeedback();
+                        return;
+                    }
+                } else {
+                    currentInput += value;
+                }
+                display.val(currentInput);
+                display[0].scrollLeft = display[0].scrollWidth;
+    
+                updateResult();
+            }
         });
-    </script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    
+        $("#clear").on("click", function() {
+            currentInput = "";
+            display.val("");
+            resultDisplay.val("");
+        });
+    
+        $("#equals").on("click", function() {
+            try {
+                let processedInput = processPercentages(currentInput);
+                processedInput = insertImplicitMultiplication(processedInput);
+                currentInput = eval(processedInput).toString();
+                display.val(currentInput);
+                display[0].scrollLeft = display[0].scrollWidth;
+                resultDisplay.val("");
+            } catch (e) {
+                display.val("Error");
+                resultDisplay.val("");
+                currentInput = "";
+            }
+        });
+    
+        $("#backspace").on("click", function() {
+            if (currentInput.length > 0) {
+                currentInput = currentInput.slice(0, -1);
+                display.val(currentInput);
+                display[0].scrollLeft = display[0].scrollWidth;
+                updateResult();
+            }
+        });
+    
+        $(document).on("keydown", function(event) {
+            const key = event.key;
+    
+            if ((key >= "0" && key <= "9") || ["+", "-", "*", "/", ".", "(", ")", "%"].includes(key)) {
+                if (operators.includes(key)) {
+                    if (isLastCharOperator()) {
+                        event.preventDefault();
+                        showErrorFeedback();
+                        return;
+                    } else {
+                        currentInput += key;
+                    }
+                } else if (key === ")") {
+                    if (canAddClosingBracket()) {
+                        currentInput += key;
+                    } else {
+                        event.preventDefault();
+                        showErrorFeedback();
+                        return;
+                    }
+                } else {
+                    currentInput += key;
+                }
+                display.val(currentInput);
+                display[0].scrollLeft = display[0].scrollWidth;
+    
+                updateResult();
+            } else if (key === "Enter" || key === "=") {
+                try {
+                    let processedInput = processPercentages(currentInput);
+                    processedInput = insertImplicitMultiplication(processedInput);
+                    currentInput = eval(processedInput).toString();
+                    display.val(currentInput);
+                    display[0].scrollLeft = display[0].scrollWidth;
+                    resultDisplay.val("");
+                } catch (e) {
+                    display.val("Error");
+                    resultDisplay.val("");
+                    currentInput = "";
+                }
+            } else if (key === "Escape" || key.toLowerCase() === "c") {
+                currentInput = "";
+                display.val("");
+                resultDisplay.val("");
+            } else if (key === "Backspace") {
+                if (currentInput.length > 0) {
+                    currentInput = currentInput.slice(0, -1);
+                    display.val(currentInput);
+                    display[0].scrollLeft = display[0].scrollWidth;
+                    updateResult();
+                }
+            }
+        });
+    });
+    
+    
+    </script> 
+            
+        </body>
+    </html>
