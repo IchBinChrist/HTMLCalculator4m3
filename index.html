@@ -8,6 +8,10 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- Math.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.1.1/math.min.js"></script>
+
     <style>
         html, body {
             margin: 0;
@@ -111,6 +115,14 @@
         let currentInput = "";
         
         const operators = ["+", "-", "*", "/"];
+
+        math.import({
+            ln: math.log
+        });
+
+        math.import({
+            log: function(x) { return math.log10(x || 1); }
+        }, { override: true });
         
         function processPercentages(expression) {
             expression = expression.replace(/÷/g, "/").replace(/×/g, "*");
@@ -159,7 +171,7 @@
                 try {
                     let processedInput = processPercentages(tempInput);
                     processedInput = insertImplicitMultiplication(processedInput);
-                    let evaluatedResult = eval(processedInput);
+                    let evaluatedResult = math.evaluate(processedInput);
                     if (tempInput === evaluatedResult.toString()) {
                         resultDisplay.val("");
                     } else {
@@ -243,7 +255,7 @@
             try {
                 let processedInput = processPercentages(currentInput);
                 processedInput = insertImplicitMultiplication(processedInput);
-                let result = eval(processedInput).toString();
+                let result = math.evaluate(processedInput);
                 addToHistory(currentInput, result);
                 currentInput = result;
                 display.val(currentInput);
@@ -305,7 +317,7 @@
                     try {
                         let processedInput = processPercentages(currentInput);
                         processedInput = insertImplicitMultiplication(processedInput);
-                        let result = eval(processedInput).toString();
+                        let result = math.evaluate(processedInput);
                         addToHistory(currentInput, result);
                         currentInput = result;
                         display.val(currentInput);
