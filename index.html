@@ -9,6 +9,9 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <style>
+        html, body {
+            margin: 0;
+        }
         #calculator {
             height: 100%;
             width: 100%;
@@ -50,6 +53,10 @@
         }
         #history div:hover {
             background-color: #f0f0f0;
+        }
+        #display.editable {
+            background-color: #fffbe6;
+            cursor: text;
         }
     </style>
 </head>
@@ -106,6 +113,7 @@
         const operators = ["+", "-", "*", "/"];
         
         function processPercentages(expression) {
+            expression = expression.replace(/÷/g, "/").replace(/×/g, "*");
             return expression.replace(/(\d+(\.\d+)?)%/g, function(match, p1) {
                 return "(" + p1 + "/100)";
             });
@@ -143,6 +151,7 @@
             }, 200);
         }
         
+        
         function updateResult() {
             let tempInput = currentInput;
             let evaluated = false;
@@ -172,11 +181,34 @@
                 history.prepend(historyItem);
             }
         }
-        
-        $("button").on("click", function() {
+        $("#display").on("input", function () {
+            currentInput = $(this).val();
+            updateResult();
+        });
+        $("#display").on("dblclick", function () {
+            let isReadonly = $(this).prop("readonly");
+            //$(this).prop("readonly", !isReadonly);
+            if ($(this).is("[readonly]")) {
+                $(this).prop("readonly", false);
+                $(this).addClass("editable");
+                // Cursor ans Ende setzen
+                this.setSelectionRange(this.value.length, this.value.length);
+                $(this).focus();
+            } else {
+                $(this).prop("readonly", true);
+                $(this).removeClass("editable");
+            }
+        });
+        $("button").on("click", function () {
             const value = $(this).data("value");
-        
+
             if (value !== undefined) {
+                // Verhindere, dass ein ")" nach einem "(" oder Operator hinzugefügt wird
+                if (value === ")" && (currentInput.slice(-1) === "(" || operators.includes(currentInput.slice(-1)))) {
+                    showErrorFeedback();
+                    return;
+                }
+
                 if (operators.includes(value)) {
                     if (isLastCharOperator()) {
                         showErrorFeedback();
@@ -196,7 +228,7 @@
                 }
                 display.val(currentInput);
                 display[0].scrollLeft = display[0].scrollWidth;
-        
+
                 updateResult();
             }
         });
@@ -233,61 +265,72 @@
             }
         });
         
-        $(document).on("keydown", function(event) {
+        $(document).on("keydown", function (event) {
             const key = event.key;
-        
-            if ((key >= "0" && key <= "9") || ["+", "-", "*", "/", ".", "(", ")", "%"].includes(key)) {
-                if (operators.includes(key)) {
-                    if (isLastCharOperator()) {
-                        event.preventDefault();
-                        showErrorFeedback();
-                        return;
+
+            // Prüfen, ob das Display readonly ist
+            if ($("#display").prop("readonly") || key === "Enter" || key === "=") {
+                // Verhindere, dass ein ")" nach einem "(" oder einem Operator hinzugefügt wird
+                if (key === ")" && (currentInput.slice(-1) === "(" || operators.includes(currentInput.slice(-1)))) {
+                    event.preventDefault();
+                    showErrorFeedback();
+                    return;
+                }
+
+                if ((key >= "0" && key <= "9") || ["+", "-", "*", "/", ".", "(", ")", "%"].includes(key)) {
+                    if (operators.includes(key)) {
+                        if (isLastCharOperator()) {
+                            event.preventDefault();
+                            showErrorFeedback();
+                            return;
+                        } else {
+                            currentInput += key;
+                        }
+                    } else if (key === ")") {
+                        if (canAddClosingBracket()) {
+                            currentInput += key;
+                        } else {
+                            event.preventDefault();
+                            showErrorFeedback();
+                            return;
+                        }
                     } else {
                         currentInput += key;
                     }
-                } else if (key === ")") {
-                    if (canAddClosingBracket()) {
-                        currentInput += key;
-                    } else {
-                        event.preventDefault();
-                        showErrorFeedback();
-                        return;
-                    }
-                } else {
-                    currentInput += key;
-                }
-                display.val(currentInput);
-                display[0].scrollLeft = display[0].scrollWidth;
-        
-                updateResult();
-            } else if (key === "Enter" || key === "=") {
-                try {
-                    let processedInput = processPercentages(currentInput);
-                    processedInput = insertImplicitMultiplication(processedInput);
-                    let result = eval(processedInput).toString();
-                    addToHistory(currentInput, result);
-                    currentInput = result;
                     display.val(currentInput);
                     display[0].scrollLeft = display[0].scrollWidth;
-                    resultDisplay.val("");
-                } catch (e) {
-                    display.val("Error");
-                    resultDisplay.val("");
-                    currentInput = "";
-                }
-            } else if (key === "Escape" || key.toLowerCase() === "c") {
-                currentInput = "";
-                display.val("");
-                resultDisplay.val("");
-            } else if (key === "Backspace") {
-                if (currentInput.length > 0) {
-                    currentInput = currentInput.slice(0, -1);
-                    display.val(currentInput);
-                    display[0].scrollLeft = display[0].scrollWidth;
+
                     updateResult();
+                } else if (key === "Enter" || key === "=") {
+                    try {
+                        let processedInput = processPercentages(currentInput);
+                        processedInput = insertImplicitMultiplication(processedInput);
+                        let result = eval(processedInput).toString();
+                        addToHistory(currentInput, result);
+                        currentInput = result;
+                        display.val(currentInput);
+                        display[0].scrollLeft = display[0].scrollWidth;
+                        resultDisplay.val("");
+                    } catch (e) {
+                        display.val("Error");
+                        resultDisplay.val("");
+                        currentInput = "";
+                    }
+                } else if (key === "Escape" || key.toLowerCase() === "c") {
+                    currentInput = "";
+                    display.val("");
+                    resultDisplay.val("");
+                } else if (key === "Backspace") {
+                    if (currentInput.length > 0) {
+                        currentInput = currentInput.slice(0, -1);
+                        display.val(currentInput);
+                        display[0].scrollLeft = display[0].scrollWidth;
+                        updateResult();
+                    }
                 }
             }
         });
+
         
         $("#history").on("click", "div", function() {
             const expression = $(this).data("expression");
@@ -303,7 +346,7 @@
             updateResult();
         });
         });
-        </script>  
+        </script>
  
             
         </body>
